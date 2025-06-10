@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Contacto - Agenda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #ffc107;
+            color: black;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: #ffc107;
+            outline: none;
+        }
+        .btn {
+            padding: 12px 25px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .form-actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+        .required {
+            color: red;
+        }
+        .current-info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ffc107;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✏️ Editar Contacto</h1>
+        <p>Modifica la información del contacto</p>
+    </div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="form-container">
+        {% if contacto %}
+            <div class="current-info">
+                <h3>📋 Información Actual:</h3>
+                <p><strong>Nombre:</strong> {{ contacto.nombre }}</p>
+                <p><strong>Teléfono:</strong> {{ contacto.telefono }}</p>
+                <p><strong>Email:</strong> {{ contacto.email }}</p>
+            </div>
+
+            <form method="POST">
+                <div class="form-group">
+                    <label for="nombre">👤 Nombre Completo <span class="required">*</span></label>
+                    <input type="text" id="nombre" name="nombre" required 
+                           value="{{ contacto.nombre }}" placeholder="Ej: Juan Pérez" maxlength="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="telefono">📱 Teléfono <span class="required">*</span></label>
+                    <input type="tel" id="telefono" name="telefono" required 
+                           value="{{ contacto.telefono }}" placeholder="Ej: +593 99 123 4567" maxlength="20">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">📧 Correo Electrónico <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required 
+                           value="{{ contacto.email }}" placeholder="Ej: juan@ejemplo.com" maxlength="100">
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-warning">💾 Actualizar Contacto</button>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">❌ Cancelar</a>
+                </div>
+            </form>
+        {% else %}
+            <div style="text-align: center; color: #666;">
+                <h3>😕 Contacto no encontrado</h3>
+                <p>El contacto que intentas editar no existe.</p>
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">🏠 Volver al inicio</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // Validación básica en el lado del cliente
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            if (!nombre || !telefono || !email) {
+                e.preventDefault();
+                alert('Por favor completa todos los campos obligatorios');
+                return false;
+            }
+
+            // Validar formato de email básico
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                e.preventDefault();
+                alert('Por favor ingresa un email válido');
+                return false;
+            }
+
+            // Confirmar cambios
+            if (confirm('¿Estás seguro de actualizar este contacto?')) {
+                return true;
+            } else {
+                e.preventDefault();
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

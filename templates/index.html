@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda de Contactos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-warning {
+            background-color: #ffc107;
+            color: black;
+        }
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        .contactos-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .contacto-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+        }
+        .contacto-info {
+            margin-bottom: 10px;
+        }
+        .contacto-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #c3e6cb;
+        }
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #f5c6cb;
+        }
+        .no-contactos {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📞 Agenda de Contactos</h1>
+        <p>Gestiona todos tus contactos de forma fácil</p>
+    </div>
+
+    <!-- Mensajes Flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Botones de navegación -->
+    <div class="nav-buttons">
+        <a href="{{ url_for('agregar_contacto') }}" class="btn">➕ Agregar Contacto</a>
+        <a href="{{ url_for('buscar_contacto') }}" class="btn">🔍 Buscar Contacto</a>
+    </div>
+
+    <!-- Lista de contactos -->
+    <div class="contactos-container">
+        <h2>Mis Contactos ({{ contactos|length }})</h2>
+        
+        {% if contactos %}
+            {% for contacto in contactos %}
+                <div class="contacto-card">
+                    <div class="contacto-info">
+                        <h3>👤 {{ contacto.nombre }}</h3>
+                        <p><strong>📱 Teléfono:</strong> {{ contacto.telefono }}</p>
+                        <p><strong>📧 Email:</strong> {{ contacto.email }}</p>
+                        <p><strong>📅 Agregado:</strong> {{ contacto.fecha_creacion }}</p>
+                    </div>
+                    <div class="contacto-actions">
+                        <a href="{{ url_for('editar_contacto', id=contacto.id) }}" class="btn btn-warning">✏️ Editar</a>
+                        <a href="{{ url_for('eliminar_contacto', id=contacto.id) }}" 
+                           class="btn btn-danger" 
+                           onclick="return confirm('¿Estás seguro de eliminar este contacto?')">🗑️ Eliminar</a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="no-contactos">
+                <h3>😔 No tienes contactos aún</h3>
+                <p>¡Comienza agregando tu primer contacto!</p>
+                <a href="{{ url_for('agregar_contacto') }}" class="btn">➕ Agregar mi primer contacto</a>
+            </div>
+        {% endif %}
