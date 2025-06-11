@@ -22,34 +22,43 @@ def get_db_connection():
         return conn
 
 def init_db():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    if DATABASE_URL:
-        # PostgreSQL
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS contactos (
-                id SERIAL PRIMARY KEY,
-                nombre VARCHAR(100) NOT NULL,
-                telefono VARCHAR(20) NOT NULL,
-                email VARCHAR(100) NOT NULL,
-                fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-    else:
-        # SQLite
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS contactos (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT NOT NULL,
-                telefono TEXT NOT NULL,
-                email TEXT NOT NULL,
-                fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-    
-    conn.commit()
-    conn.close()
+    """Inicializar la base de datos - se ejecuta automáticamente"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        if DATABASE_URL:
+            # PostgreSQL
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS contactos (
+                    id SERIAL PRIMARY KEY,
+                    nombre VARCHAR(100) NOT NULL,
+                    telefono VARCHAR(20) NOT NULL,
+                    email VARCHAR(100) NOT NULL,
+                    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        else:
+            # SQLite
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS contactos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nombre TEXT NOT NULL,
+                    telefono TEXT NOT NULL,
+                    email TEXT NOT NULL,
+                    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            ''')
+        
+        conn.commit()
+        conn.close()
+        print("Base de datos inicializada correctamente")
+    except Exception as e:
+        print(f"Error al inicializar la base de datos: {e}")
+
+# IMPORTANTE: Inicializar la base de datos al importar el módulo
+# Esto asegura que se ejecute tanto en desarrollo como en producción
+init_db()
 
 @app.route('/')
 def index():
@@ -82,6 +91,7 @@ def agregar_contacto():
                 return redirect(url_for('index'))
             except Exception as e:
                 flash('Error al agregar contacto. Intenta nuevamente.', 'error')
+                print(f"Error al agregar contacto: {e}")
         else:
             flash('Por favor completa todos los campos', 'error')
     
@@ -122,6 +132,7 @@ def editar_contacto(id):
                 return redirect(url_for('index'))
             except Exception as e:
                 flash('Error al actualizar contacto. Intenta nuevamente.', 'error')
+                print(f"Error al actualizar contacto: {e}")
         else:
             flash('Por favor completa todos los campos', 'error')
     
@@ -144,6 +155,7 @@ def eliminar_contacto(id):
         flash('Contacto eliminado exitosamente!', 'success')
     except Exception as e:
         flash('Error al eliminar contacto. Intenta nuevamente.', 'error')
+        print(f"Error al eliminar contacto: {e}")
     
     return redirect(url_for('index'))
 
@@ -172,9 +184,10 @@ def buscar_contacto():
                 conn.close()
             except Exception as e:
                 flash('Error en la búsqueda. Intenta nuevamente.', 'error')
+                print(f"Error en búsqueda: {e}")
     
     return render_template('buscar.html', contactos=contactos)
 
+# Para desarrollo local
 if __name__ == '__main__':
-    init_db()
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
