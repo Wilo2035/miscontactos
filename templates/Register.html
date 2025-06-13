@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Agenda</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .register-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 10px;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #c3e6cb;
+            margin-bottom: 10px;
+        }
+        .flash-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f5c6cb;
+            margin-bottom: 10px;
+        }
+        .required {
+            color: red;
+        }
+        .password-requirements {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+            font-size: 14px;
+        }
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        .form-row .form-group {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="header">
+            <h1>📝 Crear Cuenta</h1>
+            <p>Regístrate para comenzar a usar tu agenda personal</p>
+        </div>
+
+        <div class="password-requirements">
+            <strong>📋 Requisitos para el registro:</strong>
+            <ul>
+                <li>Usuario: 3-20 caracteres, solo letras, números y guiones bajos</li>
+                <li>Email: Debe ser una dirección válida</li>
+                <li>Contraseña: Mínimo 6 caracteres con letras y números</li>
+            </ul>
+        </div>
+
+        <!-- Mensajes Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="nombre_completo">👤 Nombre Completo <span class="required">*</span></label>
+                <input type="text" id="nombre_completo" name="nombre_completo" required 
+                       placeholder="Ej: Juan Pérez García" maxlength="100"
+                       value="{{ request.form.nombre_completo if request.form.nombre_completo }}">
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="username">🔑 Usuario <span class="required">*</span></label>
+                    <input type="text" id="username" name="username" required 
+                           placeholder="usuario123" maxlength="20"
+                           value="{{ request.form.username if request.form.username }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">📧 Email <span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required 
+                           placeholder="tu@ejemplo.com" maxlength="100"
+                           value="{{ request.form.email if request.form.email }}">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="password">🔒 Contraseña <span class="required">*</span></label>
+                    <input type="password" id="password" name="password" required 
+                           placeholder="Mínimo 6 caracteres">
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirm">🔐 Confirmar Contraseña <span class="required">*</span></label>
+                    <input type="password" id="password_confirm" name="password_confirm" required 
+                           placeholder="Repite la contraseña">
+                </div>
+            </div>
+
+            <button type="submit" class="btn">🚀 Crear Mi Cuenta</button>
+            <a href="{{ url_for('login') }}" class="btn btn-secondary">⬅️ Volver al Login</a>
+        </form>
+
+        <div class="login-link">
+            <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia sesión aquí</a></p>
+        </div>
+    </div>
+
+    <script>
+        // Enfocar automáticamente el primer campo
+        document.addEventListener('DOMContentLoaded', function() {
+            const nombreInput = document.getElementById('nombre_completo');
+            if (nombreInput && !nombreInput.value) {
+                nombreInput.focus();
+            }
+        });
+
+        // Validación en tiempo real del usuario
+        document.getElementById('username').addEventListener('input', function() {
+            const username = this.value;
+            const pattern = /^[a-zA-Z0-9_]+$/;
+            
+            if (username && !pattern.test(username)) {
+                this.style.borderColor = '#dc3545';
+            } else if (username.length >= 3) {
+                this.style.borderColor = '#28a745';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+
+        // Validación de confirmación de contraseña
+        document.getElementById('password_confirm').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
+            
+            if (confirmPassword && password !== confirmPassword) {
+                this.style.borderColor = '#dc3545';
+            } else if (confirmPassword && password === confirmPassword) {
+                this.style.borderColor = '#28a745';
+            } else {
+                this.style.borderColor = '#ddd';
+            }
+        });
+
+        // Validación completa del formulario
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const nombreCompleto = document.getElementById('nombre_completo').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('password_confirm').value;
+
+            // Validar campos obligatorios
+            if (!nombreCompleto || !username || !email || !password || !passwordConfirm) {
+                e.preventDefault();
+                alert('Por favor completa todos los campos obligatorios');
+                return false;
+            }
+
+            // Validar usuario
+            const usernamePattern = /^[a-zA-Z0-9_]{3,20}$/;
+            if (!usernamePattern.test(username)) {
+                e.preventDefault();
+                alert('El usuario debe tener entre 3-20 caracteres y solo contener letras, números y guiones bajos');
+                return false;
+            }
+
+            // Validar email
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                e.preventDefault();
+                alert('Por favor ingresa un email válido');
+                return false;
+            }
+
+            // Validar contraseña
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 6 caracteres');
+                return false;
+            }
+
+            if (!/[a-zA-Z]/.test(password) || !/[0-9]/.test(password)) {
+                e.preventDefault();
+                alert('La contraseña debe contener al menos una letra y un número');
+                return false;
+            }
+
+            // Validar confirmación de contraseña
+            if (password !== passwordConfirm) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+
+            return true;
+        });
+    </script>
+</body>
+</html>
